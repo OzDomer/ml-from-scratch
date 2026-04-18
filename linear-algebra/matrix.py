@@ -7,6 +7,7 @@ M2=[[0, 1, 2],
 [3, 4, 5],
 [6, 7, 8]]
 
+# shear
 T = [[1, 1],
      [0, 1]]
 
@@ -53,4 +54,5 @@ def draw_transformed_grid():
 draw_grid()
 print(matrix_multiply(T, [[1], [1]]))
 draw_transformed_grid()
+plt.quiver([0] * 2 , [0] * 2 ,T[0] ,T[1], angles='xy', scale_units='xy', scale=1)
 plt.show()
