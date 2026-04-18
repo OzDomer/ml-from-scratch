@@ -27,3 +27,14 @@ def cosine_similarity(a, b):
     return result
 
 print(cosine_similarity(database["cat"], database["dog"]))
+
+def words_similarity(a, b, c):
+    result = []
+    for word_1, word_2, word_3 in zip(database[a], database[b], database[c]):
+        result.append(word_1 - word_2 + word_3)       
+    return result
+
+result = words_similarity("king", "man", "woman")
+print(len(result))
+print(result)
+# print(words_similarity("king", "man", "woman"))
