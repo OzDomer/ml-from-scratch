@@ -25,3 +25,15 @@ Lastly, by getting all this we can do a cool trick: take 2 words, subtract one o
 For example:
 - king - man + woman = queen
 - france - paris + japan = tokyo
+
+## Neural Layer
+
+Without knowing calculus and with just the linear algebra I understand, I've managed to write the actual process of each neural layer of an ML model.
+
+**What I built:** A Python program that simulates a single neural network layer (forward pass) and a ReLU activation function.
+
+What `layer.py` does is take the weights and the bias — which for now will stay a "black box" that we get from other steps (the actual training) — and do math and matrix operations on the input vector to get the desired output. What happens in the neural layer function is we take each row of the weights and get its dot product with the input vector. After we get the dot product for each row, we add the corresponding bias to the result.
+
+Now since a neural network is composed of not just one layer but an increasing amount (depends on the task, hardware, etc.), doing the exact same operations won't lead us anywhere since 100 matrix multiplications are mathematically equal to just 1 matrix multiplication. That's where the ReLU function comes in — it zeros out every negative number in the output, which introduces non-linearity. That way, stacking layers actually becomes meaningful because each layer can learn different patterns. An actual neural network at the skeleton level is just a vector passing through `neural_layer()` then `ReLU()` a bunch of times.
+
+**What I learned:** A neural network layer is just a dot product of each weight row with the input, plus a bias — the same linear algebra operations I already built. ReLU adds non-linearity so that stacking layers matters. Without it, any number of layers collapses into one. The weights and biases aren't hand-picked — they're learned during training by feeding the network labeled data (inputs + correct answers) and adjusting the weights thousands of times until the output is right.

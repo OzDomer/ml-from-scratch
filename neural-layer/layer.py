@@ -5,7 +5,6 @@ bias = [4, 1]
 
 def neural_layer (input, weight, bias):
     new_vector = []
-
     for row in weight:
          dot_product = 0
          for i , w in zip(input, row):
