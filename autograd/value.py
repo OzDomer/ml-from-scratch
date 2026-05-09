@@ -24,13 +24,31 @@ class Value:
             other.grad += self.data * out.grad
         out._backward = _backward
         return out
-
+    
+    def backward(self):
+        topo = []
+        visited = set()
+        
+        def build_topo(node):
+            if node not in visited:
+                visited.add(node)
+                for parent in node._prev:
+                    build_topo(parent)
+                topo.append(node)
+        
+        build_topo(self)
+        self.grad = 1
+        for node in reversed(topo):
+            node._backward()
+        
 
 
 a = Value(3)
 b = Value(4)
-c = Value(2)
-d = a * b + c
+e = a * b           
+f = a + b           
+d = e + f           
+d.backward()
+print(a.grad)       
+print(b.grad)       
 print(d.data)       
-print(d._prev)      
-print(d._op)        
