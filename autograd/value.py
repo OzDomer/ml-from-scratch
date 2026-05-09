@@ -40,6 +40,14 @@ class Value:
         self.grad = 1
         for node in reversed(topo):
             node._backward()
+    
+    def print_graph(self, depth=0):
+        indent = "  " * depth
+        op_label = f" op={self._op}" if self._op else ""
+        print(f"{indent}Value(data={self.data}){op_label}")
+        for parent in self._prev:
+            parent.print_graph(depth + 1)      
+
         
 
 
@@ -49,6 +57,7 @@ e = a * b
 f = a + b           
 d = e + f           
 d.backward()
+d.print_graph()
 print(a.grad)       
 print(b.grad)       
 print(d.data)       
