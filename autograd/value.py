@@ -71,18 +71,3 @@ class Value:
         for parent in self._prev:
             parent.print_graph(depth + 1)      
 
-        
-
-# Test the positive case
-a = Value(3)
-b = a.relu()
-print(b.data)        # 3 (passes through unchanged)
-b.backward()
-print(a.grad)        # 1 (slope is 1 for positive inputs)
-
-# Test the negative case
-c = Value(-2)
-d = c.relu()
-print(d.data)        # 0 (zeroed out)
-d.backward()
-print(c.grad)        # 0 (slope is 0 for negative inputs)
