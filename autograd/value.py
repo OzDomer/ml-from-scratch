@@ -7,6 +7,8 @@ class Value:
         self._backward = lambda: None
     
     def __add__(self, other):
+        if not isinstance(other, Value):
+            other = Value(other)
         out = Value(self.data + other.data, (self, other), "+")
         def _backward():
             self.grad += 1 * out.grad
@@ -18,6 +20,8 @@ class Value:
         return f"Value(data={self.data})"
 
     def __mul__(self, other):
+        if not isinstance(other, Value):
+            other = Value(other)
         out = Value(self.data * other.data, (self, other), "*")
         def _backward():
             self.grad += other.data * out.grad
@@ -38,6 +42,15 @@ class Value:
             self.grad += (other * self.data ** (other - 1)) * out.grad
         out._backward = _backward
         return out
+    
+    def __radd__(self, other):
+        return self + other
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __rsub__(self, other):
+        return Value(other) - self
     
     def relu(self):
         out = Value(max(0, self.data), (self,), "relu")
