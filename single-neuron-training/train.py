@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../autograd')
 
-from value import Value
+from value import Value #type: ignore
 import random
 
 random.seed(42)
