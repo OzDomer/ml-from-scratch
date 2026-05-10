@@ -69,3 +69,20 @@ Once training is done, the model gets presented with inputs that *weren't* in th
 **What I learned:** This phase was less learning-intensive than the ones before it — it was mostly implementing on top of foundations already in place. But running the generalization test and seeing it work in real time reinforced what makes ML different from a lookup table: the model doesn't memorize training points, it finds a function that fits all of them, and that function then applies to new inputs it has never seen.
 
 I also picked up the learning rate trade-off first-hand — too small and training drags, too large and the model overshoots and the loss explodes. Theorizing about why a fixed learning rate is fragile led me to discover that smarter optimizers exist: ones that adjust the learning rate dynamically, or use the recent gradient history to dampen oscillations, or both. Plain gradient descent (what I implemented) is the simplest possible thing — and the reason fancier optimizers like Adam exist is exactly the fragility I ran into. 
+
+## Multi-Layer Perceptron (XOR)
+
+**What I built:** I built the solution to XOR — the smallest classic problem a single-neuron machine can't solve. Not because of how many parameters a neuron has, but because the answer can't be drawn as a single straight line in input space — the inputs are *non-linearly separable*, and a single neuron can only produce linear decision boundaries. The fix is a hidden layer with non-linear activation, which lets the decision boundary bend.
+
+To build this kind of network, I wrote three classes that compose into a hierarchy:
+- **`Neuron`** — owns its own weights and bias, computes a weighted sum, and applies ReLU. Each neuron has a `use_relu` flag, which the MLP turns off for the output layer (regression outputs need to be free to take any value).
+- **`Layer`** — a list of neurons that all see the same input.
+- **`MLP`** — a list of layers, called in sequence so each layer's outputs become the next layer's inputs.
+
+The training loop itself is unchanged from the single-neuron stage — forward, zero gradients, backward, update — except that "every parameter" is now 13 of them instead of 2, accessed through a `parameters()` method on each class.
+
+**What I learned:** The interesting thing about this stage was that mathematically, XOR can be solved by a network with just 3 hidden neurons. But every run I tried with 3 neurons ended up stuck — some of them died (their pre-activation was always negative, ReLU zeroed them out, and no gradient flowed back to revive them). The network would learn one input-output pair correctly and give up on the rest.
+
+The fix was to give the network more hidden neurons than strictly necessary. Bumping the hidden layer to 8 neurons made training breeze through — even if a few die during initialization, 8 is enough that the survivors can still solve the problem. The principle (which apparently shows up everywhere in real ML): networks need *redundant capacity* so that bad initialization, dead neurons, and stuck pathways don't kill training.
+
+This stage felt different from the previous ones — less "new fundamental concept" and more "compose what I already had into a richer structure." Most of the progress was organizational rather than mathematical, which is apparently a real pattern in ML: most architectural progress is about combining existing primitives in new ways, not inventing new math.
