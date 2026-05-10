@@ -1,4 +1,4 @@
-# ml-from-scratch
+# ml from scratch
 
 A side project I'm working on to understand AI, ML, and deep learning from the ground up. Zero expectations — just genuine curiosity. The long-term goal is to eventually build my own small ML program from scratch.
 
@@ -49,3 +49,23 @@ That graph is what makes training possible. Each node carries a small function t
 **What I learned:** Connecting this back to ML, I learned that to understand the actual change from the input to the output, we have to calculate the gradient of each function using the chain rule. But the chain rule alone isn't enough — since it's a multi-step process, we have to "save" each step along the way. This is where saving each parent and the operation used comes in handy. It lets us build a tree-shaped graph as we go forward, and that saved graph is what enables us to walk backwards through it. This is where the term *backpropagation* comes from.
 
 When the machine walks backwards, it calculates the gradients. A separate step then uses those gradients as a "guideline" to adjust the knobs (`w`, `b`) in the direction that reduces the loss. The full training loop runs forward to get the prediction and the loss, then backwards to compute the gradients, then the descent step adjusts the knobs (bigger loss → bigger adjustment). Looped enough times, the loss approaches 0 and the model has "learned."
+
+## Single Neuron Training
+
+**What I built:** After creating the `Value` class, I can use it to train a "model" — a single-neuron one, but still a model. What `train.py` does is take a list of inputs paired with targets, then wraps the knobs (`w`, `b`) as `Value` objects so they live in the autograd graph. The knobs start random each run.
+
+Setting the learning rate is a balancing act: too big and the updates overshoot the answer and oscillate; too small and each step barely moves, so it takes far more iterations to converge.
+
+After setting parameters, the loop runs:
+- **Forward pass** — accumulate loss across all training inputs (MSE)
+- **Zero out gradients** — autograd uses `+=` for accumulation, so without this every loop would compound the gradients from previous loops
+- **Backward pass** — propagate gradients back through the graph
+- **Update knobs** — `w` and `b` step in the opposite direction of their gradients, scaled by the learning rate
+
+The next loop runs with the updated knobs and tries again. After enough iterations, `w` and `b` settle on values that fit all the training points.
+
+Once training is done, the model gets presented with inputs that *weren't* in the training data. It still makes good predictions — and that's what makes this an actual model and not a lookup table that can only answer about its training set.
+
+**What I learned:** This phase was less learning-intensive than the ones before it — it was mostly implementing on top of foundations already in place. But running the generalization test and seeing it work in real time reinforced what makes ML different from a lookup table: the model doesn't memorize training points, it finds a function that fits all of them, and that function then applies to new inputs it has never seen.
+
+I also picked up the learning rate trade-off first-hand — too small and training drags, too large and the model overshoots and the loss explodes. Theorizing about why a fixed learning rate is fragile led me to discover that smarter optimizers exist: ones that adjust the learning rate dynamically, or use the recent gradient history to dampen oscillations, or both. Plain gradient descent (what I implemented) is the simplest possible thing — and the reason fancier optimizers like Adam exist is exactly the fragility I ran into. 
