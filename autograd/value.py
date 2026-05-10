@@ -25,6 +25,29 @@ class Value:
         out._backward = _backward
         return out
     
+    def __neg__(self):
+        return self * Value(-1)
+
+    def __sub__(self, other):
+        return self + (-other)
+    
+    def __pow__(self, other):
+        assert isinstance(other, (int, float)), "only supporting constant powers"
+        out = Value(self.data ** other, (self,), f"**{other}")
+        def _backward():
+            self.grad += (other * self.data ** (other - 1)) * out.grad
+        out._backward = _backward
+        return out
+    
+    def relu(self):
+        out = Value(max(0, self.data), (self,), "relu")
+
+        def _backward():
+            self.grad += (out.data > 0) * out.grad
+
+        out._backward = _backward
+        return out
+
     def backward(self):
         topo = []
         visited = set()
@@ -50,14 +73,16 @@ class Value:
 
         
 
-
+# Test the positive case
 a = Value(3)
-b = Value(4)
-e = a * b           
-f = a + b           
-d = e + f           
+b = a.relu()
+print(b.data)        # 3 (passes through unchanged)
+b.backward()
+print(a.grad)        # 1 (slope is 1 for positive inputs)
+
+# Test the negative case
+c = Value(-2)
+d = c.relu()
+print(d.data)        # 0 (zeroed out)
 d.backward()
-d.print_graph()
-print(a.grad)       
-print(b.grad)       
-print(d.data)       
+print(c.grad)        # 0 (slope is 0 for negative inputs)
